@@ -22,6 +22,8 @@
  * @param {GLatLng} to
  * @param {Object} opts
  * @author Marcelo Alvim
+ * 
+ * Code licensed under the WTFPL version 2. For more details see the COPYING file.
  */
 var QuadraticBezierLine = function(from, to, opts) {
 	this.from = from;

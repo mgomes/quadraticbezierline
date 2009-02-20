@@ -9,24 +9,19 @@
 		var div = document.getElementById("map");
 		div.style.width = '1000px';
 		div.style.height = '600px';
-		this.map = new GMap2(div);
-		this.map.addControl(new GLargeMapControl());
-		this.map.addControl(new GScaleControl());
-		this.map.addControl(new GMapTypeControl());
-		this.map.enableScrollWheelZoom();
-		this.map.enableContinuousZoom();
-		this.map.enableDoubleClickZoom();
-		this.map.setCenter(new GLatLng(10, 10), 4);
+		map = new GMap2(div);
+		map.addControl(new GLargeMapControl());
+		map.addControl(new GScaleControl());
+		map.addControl(new GMapTypeControl());
+		map.enableScrollWheelZoom();
+		map.enableContinuousZoom();
+		map.enableDoubleClickZoom();
+		map.setCenter(new GLatLng(10, 10), 4);
 		
 		var line = new QuadraticBezierLine(new GLatLng(0, 0), new GLatLng(10, 10));
 		this.map.addOverlay(line);
 	}
 	</script>
-	
-	
-	
-	
-	
 </head>
 <body onload="load();">
 	<div id="map" width="800" height="400"></div>

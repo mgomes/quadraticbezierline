@@ -21,6 +21,7 @@
  * @param {GLatLng} from
  * @param {GLatLng} to
  * @param {Object} opts
+ * 
  * @author Marcelo Alvim
  * 
  * Code licensed under the WTFPL version 2. For more details see the COPYING file.
@@ -30,6 +31,7 @@ var QuadraticBezierLine = function(from, to, opts) {
 	this.to = to;
 	this.opts = QuadraticBezierLine.defaults; // WorldView.Util.mergeOptions(opts, QuadraticBezierLine.defaults);
 	this.control = this.opts.controlPoint || this.calculateControlPoint();
+	this.points = null;
 	GPolyline.call(this, this.getPolylinePoints(), this.opts.color, this.opts.weight, this.opts.opacity);
 };
 
@@ -46,21 +48,25 @@ QuadraticBezierLine.defaults = {color: "#ff0000", opacity: 0.6, weight: 5, steps
  * @return Array<GLatLng>
  */
 QuadraticBezierLine.prototype.getPolylinePoints = function() {
-	var points = [];
-	var steps = (this.opts.steps % 2 === 0) ? (this.opts.steps) : (this.opts.steps + 1); // number of steps has to be even
-	var pt = null;
-	for(var t = 0; t <= steps; t++) {
-		pt = this.getPoint(t * (1 / steps));
-		if(t == steps / 2) {
-			this.middlePoint = pt;
+	var self = this;
+	
+	return this.points || (function() {
+		self.points = [];
+		var steps = (self.opts.steps % 2 === 0) ? (self.opts.steps) : (self.opts.steps + 1); // number of steps has to be even
+		var pt = null;
+		for(var t = 0; t <= steps; t++) {
+			pt = self.getPoint(t * (1 / steps));
+			if(t === (steps / 2)) {
+				self.middlePoint = pt;
+			}
+			self.points.push(pt);
 		}
-		points.push(pt);
-	}
-	return points;
+		return self.points;
+	})();
 };
 
 /**
- * Calculates the control point using the two endpoints and the curve factor.
+ * Calculates the control point using the two endpoints and the "curve factor".
  * Does that by calculating the middle point, then offseting it away from the line that connects the two endpoints.
  * The amount of offseting is given by the factor. A factor of 1.0 makes the distance from the point to the line be
  * equal to the length of the line. 0.5 makes it half the line length.
@@ -86,7 +92,7 @@ QuadraticBezierLine.prototype.calculateControlPoint = function() {
  * @param {GLatLng} to
  * @param {float} t
  * 
- * @return (GLatLng)
+ * @return GLatLng
  */
 QuadraticBezierLine.prototype.getPoint = function(t) {
 	var lat = this.bezier(t, function(pt) {return pt.lat();});
@@ -97,10 +103,11 @@ QuadraticBezierLine.prototype.getPoint = function(t) {
 /**
  * The actual Quadratic Bezier function. Calculates a number based on the three points and the "t" parameter.
  * 
- * @param {float} from
- * @param {float} control
- * @param {float} to
- * @param {float} t
+ * @param {float} t, the current interpolation step
+ * @param {function} getValue, a function that will be called with this.from, this.control and this.to, and will
+ *   return the value (lat or lng) that will be used to calculate the current point
+ * 
+ * @return float, the calculated bezier value
  */
 QuadraticBezierLine.prototype.bezier = function(t, getValue) {
 	return (((1 - t) * (1 - t)) * (getValue(this.from))) + ((2 * t) * (1 - t) * (getValue(this.control))) + ((t * t) * (getValue(this.to)));

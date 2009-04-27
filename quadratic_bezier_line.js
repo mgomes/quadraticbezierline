@@ -29,7 +29,7 @@
 var QuadraticBezierLine = function(from, to, opts) {
 	this.from = from;
 	this.to = to;
-	this.opts = QuadraticBezierLine.defaults; // WorldView.Util.mergeOptions(opts, QuadraticBezierLine.defaults);
+	this.opts = QuadraticBezierLine.mergeOptions(opts, QuadraticBezierLine.defaults);
 	this.control = this.opts.controlPoint || this.calculateControlPoint();
 	this.points = null;
 	GPolyline.call(this, this.getPolylinePoints(), this.opts.color, this.opts.weight, this.opts.opacity);
